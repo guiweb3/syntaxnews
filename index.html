@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Syntax News — Jornalismo Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden}
+img{max-width:100%;height:auto}
+:root{--ink:#1a1a1a;--paper:#faf9f6;--muted:#888;--border:#ddd;--accent:#1a1a1a}
+body{font-family:'Source Sans 3',sans-serif;background:var(--paper);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+.header{max-width:1000px;margin:0 auto;padding:2rem 2rem 1rem;text-align:center;border-bottom:2px solid var(--ink)}
+.logo{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;letter-spacing:-1px}
+.dateline{font-size:.75rem;color:var(--muted);margin-top:.5rem}
+.nav{display:flex;justify-content:center;gap:2rem;padding:1rem 0;font-size:.8rem;font-weight:500;border-bottom:1px solid var(--border);max-width:1000px;margin:0 auto}
+.nav a:hover{text-decoration:underline}
+.hero{max-width:1000px;margin:2.5rem auto;padding:0 2rem;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.hero-text h1{font-family:'Playfair Display',serif;font-size:2.6rem;line-height:1.15;font-weight:900}
+.hero-text p{font-size:1rem;line-height:1.7;color:#444;margin-top:1rem}
+.hero-text .byline{font-size:.8rem;color:var(--muted);margin-top:1rem;font-style:italic}
+.hero-img{width:100%;height:380px;object-fit:cover}
+.section-divider{max-width:1000px;margin:3rem auto 1.5rem;padding:0 2rem;text-align:center}
+.section-divider h2{font-family:'Playfair Display',serif;font-size:1.1rem;letter-spacing:3px;text-transform:uppercase}
+.section-divider span{font-size:.8rem;color:var(--muted);font-style:italic}
+.grid{max-width:1000px;margin:0 auto;padding:0 2rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.card{cursor:pointer}
+.card img{width:100%;height:150px;object-fit:cover;margin-bottom:.8rem}
+.card h3{font-family:'Playfair Display',serif;font-size:1rem;line-height:1.35;margin-bottom:.4rem}
+.card p{font-size:.8rem;color:#555;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card .byline{font-size:.72rem;color:var(--muted);margin-top:.5rem;font-style:italic}
+.footer{max-width:1000px;margin:4rem auto 0;padding:2rem;border-top:2px solid var(--ink);text-align:center;font-size:.75rem;color:var(--muted)}
+.article-view{max-width:680px;margin:2rem auto;padding:0 2rem;display:none}
+.article-view.active{display:block}
+.article-view .back{font-size:.85rem;color:var(--muted);cursor:pointer;margin-bottom:2rem;display:inline-block}
+.article-view .back:hover{color:var(--ink)}
+.article-view h1{font-family:'Playfair Display',serif;font-size:2.4rem;line-height:1.15;font-weight:900;margin-bottom:.5rem}
+.article-view .meta{font-size:.85rem;color:var(--muted);font-style:italic;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.article-view .cover{width:100%;margin-bottom:2rem}
+.article-view .body{font-size:1.05rem;line-height:1.9;color:#333}
+.article-view .body p{margin-bottom:1.2rem}
+.article-view .tags{margin-top:2rem;display:flex;gap:8px;flex-wrap:wrap}
+.article-view .tags span{font-size:.72rem;border:1px solid var(--border);padding:3px 10px;border-radius:2px}
+.home-view{}
+.home-view.hidden{display:none}
+.search-row{max-width:1000px;margin:1rem auto;padding:0 2rem;text-align:right}
+.search-row input{border:1px solid var(--border);padding:6px 14px;font-size:.8rem;font-family:inherit;outline:none;width:200px}
+@media(max-width:768px){
+.header{padding:1.5rem 1rem .8rem}
+.logo{font-size:1.8rem}
+.nav{display:none}
+.hero{grid-template-columns:1fr;padding:0 1rem}
+.hero-text h1{font-size:1.8rem}
+.hero-img{height:220px}
+.grid{grid-template-columns:1fr!important;padding:0 1rem}
+.section-divider{padding:0 1rem}
+.footer{padding:2rem 1rem}
+.article-view{padding:0 1rem}
+.article-view h1{font-size:1.6rem}
+.search-row{padding:0 1rem}
+.search-row input{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="home-view" id="homeView">
+<div class="header"><div class="logo">Syntax News</div><div class="dateline" id="dateline"></div></div>
+<div class="nav" id="navFilters"></div>
+<div class="search-row"><input type="text" placeholder="Buscar artigo..." id="searchInput" oninput="handleSearch()"></div>
+<div class="hero" id="heroSection"></div>
+<div class="section-divider"><h2>Últimas Notícias</h2><span>O essencial de hoje.</span></div>
+<div class="grid" id="newsGrid"></div>
+<div class="footer">© 2026 Syntax News. Jornalismo digital independente.</div>
+</div>
+<div class="article-view" id="articleView"><span class="back" onclick="goHome()">← Voltar às notícias</span><div id="articleContent"></div></div>
+<script>
+const SUPA="https://vpvsrjkotstvjywhuacr.supabase.co",KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwdnNyamtvdHN0dmp5d2h1YWNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzE2MzQsImV4cCI6MjA2MjgwNzYzNH0.bkCzpHsSJ-v4OPyn1DQNFM-JfgJhLBjf1WBCPISXH2U";
+let allNews=[],searchQuery='',currentFilter='';
+document.getElementById('dateline').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function parseTags(h){if(!h)return[];if(Array.isArray(h))return h;if(typeof h==='string')return h.split('#').filter(Boolean).map(t=>t.trim());return[]}
+async function init(){const r=await fetch(SUPA+'/rest/v1/noticiasgeral?status=eq.publicado&order=created_at.desc&limit=30',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});allNews=await r.json();renderHome();handleHash()}
+function renderHome(){let news=getFiltered();if(news.length>0){const n=news[0];document.getElementById('heroSection').innerHTML=`
+<div class="hero-text"><h1>${n.titulo_noticia||''}</h1><p>${(n.resumo_noticia||'').slice(0,250)}...</p><div class="byline">Por ${n.autor||'Redação'} · <a href="#/article/${n.slug}" style="text-decoration:underline">Ler artigo</a></div></div>
+<img class="hero-img" src="${n.capa_noticia||''}" onerror="this.style.background='#eee'" alt="">`;}
+document.getElementById('newsGrid').innerHTML=news.slice(1).map(n=>{const tags=parseTags(n.hashtags);return`
+<a href="#/article/${n.slug}" class="card"><img src="${n.capa_noticia||''}" onerror="this.style.background='#eee'" alt=""><h3>${n.titulo_noticia||''}</h3><p>${(n.resumo_noticia||'').slice(0,100)}</p><div class="byline">Por ${n.autor||'Redação'}</div></a>`}).join('');
+const cats=[...new Set(allNews.flatMap(n=>parseTags(n.hashtags).slice(0,2)))].filter(c=>c.length<15).slice(0,6);
+document.getElementById('navFilters').innerHTML=cats.map(c=>`<a href="#" onclick="event.preventDefault();setFilter('${c}')">${c}</a>`).join('')}
+function setFilter(f){currentFilter=currentFilter===f?'':f;renderHome()}
+function handleSearch(){searchQuery=document.getElementById('searchInput').value.toLowerCase();renderHome()}
+function getFiltered(){let f=allNews;if(currentFilter)f=f.filter(n=>parseTags(n.hashtags).includes(currentFilter));if(searchQuery)f=f.filter(n=>(n.titulo_noticia||'').toLowerCase().includes(searchQuery)||(n.resumo_noticia||'').toLowerCase().includes(searchQuery));return f}
+function showArticle(slug){const n=allNews.find(a=>a.slug===slug);if(!n)return;const tags=parseTags(n.hashtags);document.getElementById('articleContent').innerHTML=`<h1>${n.titulo_noticia||''}</h1><div class="meta">Por ${n.autor||'Redação'} · ${n.created_at?new Date(n.created_at).toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'}):''}</div>${n.capa_noticia?`<img class="cover" src="${n.capa_noticia}" alt="">`:''}
+<div class="body">${(n.resumo_noticia||'').split('\n').map(p=>'<p>'+p+'</p>').join('')}</div><div class="tags">${tags.map(t=>'<span>'+t+'</span>').join('')}</div>`;document.getElementById('homeView').classList.add('hidden');document.getElementById('articleView').classList.add('active');window.scrollTo(0,0)}
+function goHome(){document.getElementById('homeView').classList.remove('hidden');document.getElementById('articleView').classList.remove('active')}
+function handleHash(){const h=location.hash;if(h.startsWith('#/article/'))showArticle(h.replace('#/article/',''));else goHome()}
+window.addEventListener('hashchange',handleHash);init();
+</script></body></html>
